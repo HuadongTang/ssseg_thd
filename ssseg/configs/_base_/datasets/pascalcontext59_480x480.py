@@ -5,7 +5,7 @@ import os
 '''DATASET_CFG_PASCALCONTEXT59_480x480'''
 DATASET_CFG_PASCALCONTEXT59_480x480 = {
     'type': 'PascalContext59Dataset',
-    'rootdir': os.path.join(os.getcwd(), 'VOCdevkit/VOC2010/'),
+    'rootdir': '/home/minzhou/Data/edcode/Data/VOCdevkit/VOC2010',
     'train': {
         'set': 'train',
         'data_pipelines': [

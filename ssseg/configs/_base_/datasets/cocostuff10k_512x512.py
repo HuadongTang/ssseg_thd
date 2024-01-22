@@ -5,7 +5,7 @@ import os
 '''DATASET_CFG_COCOStuff10k_512x512'''
 DATASET_CFG_COCOStuff10k_512x512 = {
     'type': 'COCOStuff10kDataset',
-    'rootdir': os.path.join(os.getcwd(), 'COCOStuff10k'),
+    'rootdir': '/home/minzhou/Data/edcode/Data/COCOStuff10k',
     'train': {
         'set': 'train',
         'data_pipelines': [

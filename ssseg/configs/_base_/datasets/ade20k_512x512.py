@@ -5,7 +5,7 @@ import os
 '''DATASET_CFG_ADE20k_512x512'''
 DATASET_CFG_ADE20k_512x512 = {
     'type': 'ADE20kDataset',
-    'rootdir': os.path.join(os.getcwd(), 'ADE20k'),
+    'rootdir': '/home/minzhou/Data/edcode/Data/',
     'train': {
         'set': 'train',
         'data_pipelines': [

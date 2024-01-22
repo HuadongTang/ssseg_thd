@@ -8,7 +8,7 @@ SEGMENTOR_CFG = {
     'work_dir': 'ckpts',
     'logfilepath': '',
     'log_interval_iterations': 50,
-    'eval_interval_epochs': 10,
+    'eval_interval_epochs': 1,
     'save_interval_epochs': 1,
     'resultsavepath': '',
     'norm_cfg': {'type': 'SyncBatchNorm'},
@@ -18,9 +18,10 @@ SEGMENTOR_CFG = {
         'pretrained': True, 'outstride': 8, 'use_conv3x3_stem': True, 'selected_indices': (0, 1, 2, 3),
     },
     'head': {
+        'in_channels_list': [128, 256, 512, 1024], 'feats_channels': 512, 'pool_scales': [1, 2, 3, 6], 'dropout': 0.1,
         'downsample_backbone': {'kernel_size': 3, 'stride': 1, 'padding': 1, 'bias': False},
-        'context_within_image': {'is_on': True, 'type': ['ppm', 'aspp'][1], 'cfg': {'dilations': [1, 12, 24, 36]}},
-        'use_hard_aggregate': False, 'in_channels': 2048, 'feats_channels': 512, 'transform_channels': 256,
+        'context_within_image': {'is_on': False, 'type': ['ppm', 'aspp'][1], 'cfg': {'dilations': [1, 12, 24, 36]}},
+        'use_hard_aggregate': False, 'in_channels': 2048, 'feats_channels': 512, 'transform_channels': 512,
         'out_channels': 512, 'num_feats_per_cls': 1, 'use_loss': True, 'loss_cfg': {'CrossEntropyLoss': {'scale_factor': 1.0, 'reduction': 'mean'}},
         'update_cfg': {
             'strategy': 'cosine_similarity', 'ignore_index': 255,
@@ -35,6 +36,7 @@ SEGMENTOR_CFG = {
         'loss_aux': {'CrossEntropyLoss': {'scale_factor': 0.4, 'ignore_index': 255, 'reduction': 'mean'}},
         'loss_cls_stage1': {'CrossEntropyLoss': {'scale_factor': 0.4, 'ignore_index': 255, 'reduction': 'mean'}},
         'loss_cls_stage2': {'CrossEntropyLoss': {'scale_factor': 1.0, 'ignore_index': 255, 'reduction': 'mean'}},
+        # 'loss_aff': {'affinity_loss': {'scale_factor': 1.0, 'ignore_index': 255, 'reduction': 'mean'}},
     },
     'inference': {
         'mode': 'whole',
@@ -51,4 +53,7 @@ SEGMENTOR_CFG = {
     },
     'dataset': None,
     'dataloader': None,
+    'build_dist_model_cfg': {
+    'find_unused_parameters':True
+    }
 }

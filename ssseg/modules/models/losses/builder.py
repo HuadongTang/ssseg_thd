@@ -12,7 +12,7 @@ from .lovaszloss import LovaszLoss
 from .focalloss import SigmoidFocalLoss
 from .cosinesimilarityloss import CosineSimilarityLoss
 from .celoss import CrossEntropyLoss, BinaryCrossEntropyLoss
-
+from .affinityloss import AffinityLoss
 
 '''BuildLoss'''
 def BuildLoss(loss_cfg):
@@ -21,7 +21,7 @@ def BuildLoss(loss_cfg):
     supported_losses = {
         'L1Loss': L1Loss, 'DiceLoss': DiceLoss, 'KLDivLoss': KLDivLoss, 'LovaszLoss': LovaszLoss,
         'CrossEntropyLoss': CrossEntropyLoss, 'SigmoidFocalLoss': SigmoidFocalLoss,
-        'CosineSimilarityLoss': CosineSimilarityLoss, 'BinaryCrossEntropyLoss': BinaryCrossEntropyLoss,
+        'CosineSimilarityLoss': CosineSimilarityLoss, 'BinaryCrossEntropyLoss': BinaryCrossEntropyLoss, 'affinity_loss': AffinityLoss,
     }
     # build loss
     loss_type = loss_cfg.pop('type')

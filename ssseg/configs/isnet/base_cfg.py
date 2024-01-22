@@ -8,7 +8,7 @@ SEGMENTOR_CFG = {
     'work_dir': 'ckpts',
     'logfilepath': '',
     'log_interval_iterations': 50,
-    'eval_interval_epochs': 10,
+    'eval_interval_epochs': 1,
     'save_interval_epochs': 1,
     'resultsavepath': '',
     'norm_cfg': {'type': 'SyncBatchNorm'},
@@ -28,6 +28,7 @@ SEGMENTOR_CFG = {
         'loss_aux': {'CrossEntropyLoss': {'scale_factor': 0.4, 'ignore_index': 255, 'reduction': 'mean'}},
         'loss_cls_stage1': {'CrossEntropyLoss': {'scale_factor': 0.4, 'ignore_index': 255, 'reduction': 'mean'}},
         'loss_cls_stage2': {'CrossEntropyLoss': {'scale_factor': 1.0, 'ignore_index': 255, 'reduction': 'mean'}},
+        # 'loss_aff': {'affinity_loss': {'scale_factor': 1.0, 'ignore_index': 255, 'reduction': 'mean'}},
     },
     'inference': {
         'mode': 'whole',

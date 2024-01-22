@@ -265,3 +265,10 @@ class FeaturesMemory(nn.Module):
             memory = self.memory.data.clone()
             dist.all_reduce(memory.div_(dist.get_world_size()))
             self.memory = nn.Parameter(memory, requires_grad=False)
+
+# def cosine_similarity(x, y, eps=1e-8):
+#     return (x * y).sum(1) / (x.norm(dim=1) * y.norm(dim=1) + eps)
+
+
+# def pearson_correlation(x, y, eps=1e-8):
+#     return cosine_similarity(x - x.mean(1).unsqueeze(1), y - y.mean(1).unsqueeze(1), eps)

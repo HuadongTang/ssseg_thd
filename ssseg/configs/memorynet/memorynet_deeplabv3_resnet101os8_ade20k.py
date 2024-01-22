@@ -14,6 +14,6 @@ SEGMENTOR_CFG['dataloader'] = DATALOADER_CFG_BS16.copy()
 SEGMENTOR_CFG['scheduler']['max_epochs'] = 130
 # modify other segmentor configs
 SEGMENTOR_CFG['num_classes'] = 150
-SEGMENTOR_CFG['work_dir'] = 'memorynet_deeplabv3_resnet101os8_ade20k'
-SEGMENTOR_CFG['logfilepath'] = 'memorynet_deeplabv3_resnet101os8_ade20k/memorynet_deeplabv3_resnet101os8_ade20k.log'
-SEGMENTOR_CFG['resultsavepath'] = 'memorynet_deeplabv3_resnet101os8_ade20k/memorynet_deeplabv3_resnet101os8_ade20k_results.pkl'
+SEGMENTOR_CFG['work_dir'] = 'memorynet_deeplabv3_resnet101os8_ade20k_deeplabmem_seg64'
+SEGMENTOR_CFG['logfilepath'] = 'memorynet_deeplabv3_resnet101os8_ade20k_deeplabmem_seg64/memorynet_deeplabv3_resnet101os8_ade20k.log'
+SEGMENTOR_CFG['resultsavepath'] = 'memorynet_deeplabv3_resnet101os8_ade20k_deeplabmem_seg64/memorynet_deeplabv3_resnet101os8_ade20k_results.pkl'

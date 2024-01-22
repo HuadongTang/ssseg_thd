@@ -189,7 +189,7 @@ class BaseSegmentor(nn.Module):
             if (key in ['BinaryCrossEntropyLoss']) and hasattr(self, 'onehot'):
                 prediction_iter = prediction_format
                 target_iter = self.onehot(target, self.cfg['num_classes'])
-            elif key in ['DiceLoss', 'LovaszLoss', 'KLDivLoss', 'L1Loss', 'CosineSimilarityLoss']:
+            elif key in ['DiceLoss', 'LovaszLoss', 'KLDivLoss', 'L1Loss', 'CosineSimilarityLoss', 'affinity_loss']:
                 prediction_iter = prediction
                 target_iter = target
             else:
