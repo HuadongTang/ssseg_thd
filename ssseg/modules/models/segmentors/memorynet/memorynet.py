@@ -308,18 +308,12 @@ class MemoryNet(BaseSegmentor):
             outputs_dict.update({'loss_cls_stage1': preds_stage1, 'loss_cls_stage2': preds_stage2})
             with torch.no_grad():
                 self.memory_module.update(
-                    features=memory_input,
-                    segmentation=F.interpolate(targets['seg_target'].unsqueeze(1), size=seg_size, mode='nearest'),
+                    features=F.interpolate(memory_input, size=img_size, mode='bilinear',
+                                           align_corners=self.align_corners),
+                    segmentation=targets['seg_target'],
                     learning_rate=kwargs['learning_rate'],
                     **self.cfg['head']['update_cfg']
                 )
-                # self.memory_module.update(
-                #     features=F.interpolate(memory_input, size=img_size, mode='bilinear',
-                #                            align_corners=self.align_corners),
-                #     segmentation=targets['seg_target'],
-                #     learning_rate=kwargs['learning_rate'],
-                #     **self.cfg['head']['update_cfg']
-                # )
             loss, losses_log_dict = self.calculatelosses(
                 predictions=outputs_dict,
                 targets=targets,
