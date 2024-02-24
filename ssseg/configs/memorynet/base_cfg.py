@@ -18,7 +18,7 @@ SEGMENTOR_CFG = {
         'pretrained': True, 'outstride': 8, 'use_conv3x3_stem': True, 'selected_indices': (0, 1, 2, 3),
     },
     'head': {
-        'in_channels_list': [128, 256, 512, 1024], 'feats_channels': 512, 'pool_scales': [1, 2, 3, 6], 'dropout': 0.1,
+        # 'in_channels_list': [128, 256, 512, 1024], 'feats_channels': 512, 'pool_scales': [1, 2, 3, 6], 'dropout': 0.1,
         'downsample_backbone': {'kernel_size': 3, 'stride': 1, 'padding': 1, 'bias': False},
         'context_within_image': {'is_on': False, 'type': ['ppm', 'aspp'][1], 'cfg': {'dilations': [1, 12, 24, 36]}},
         'use_hard_aggregate': False, 'in_channels': 2048, 'feats_channels': 512, 'transform_channels': 512,
