@@ -18,7 +18,7 @@ SEGMENTOR_CFG['backbone'] = {
     'type': 'ResNet', 'depth': 50, 'structure_type': 'resnet50conv3x3stem',
     'pretrained': True, 'outstride': 8, 'use_conv3x3_stem': True, 'selected_indices': (0, 1, 2, 3),
 }
-SEGMENTOR_CFG['head']['use_loss'] = False
+# SEGMENTOR_CFG['head']['use_loss'] = False
 SEGMENTOR_CFG['work_dir'] = 'memorynet_deeplabv3_resnet50os8_ade20k_deeplab_mem_seg64Tnewklin_womemloss_pearson'
 SEGMENTOR_CFG['logfilepath'] = 'memorynet_deeplabv3_resnet50os8_ade20k_deeplab_mem_seg64Tnewklin_womemloss_pearson/memorynet_deeplabv3_resnet50os8_ade20k.log'
 SEGMENTOR_CFG['resultsavepath'] = 'memorynet_deeplabv3_resnet50os8_ade20k_deeplab_mem_seg64Tnewklin_womemloss_pearson/memorynet_deeplabv3_resnet50os8_ade20k_results.pkl'
