@@ -14,7 +14,7 @@ from torch.nn import Softmax
 
 '''FeaturesMemory'''
 class FeaturesMemory(nn.Module):
-    def __init__(self, num_classes, feats_channels, transform_channels, out_channels, use_context_within_image=True, 
+    def __init__(self, num_classes, feats_channels, transform_channels, out_channels, use_context_within_image=True,
                  num_feats_per_cls=1, use_hard_aggregate=False, norm_cfg=None, act_cfg=None):
         super(FeaturesMemory, self).__init__()
         assert num_feats_per_cls > 0, 'num_feats_per_cls should be larger than 0'
@@ -53,11 +53,11 @@ class FeaturesMemory(nn.Module):
         #             act_cfg=act_cfg,
         #         )
         #         self.self_attentions.append(self_attention)
-        #     self.fuse_memory_conv = nn.Sequential(
-        #         nn.Conv2d(feats_channels * self.num_feats_per_cls, feats_channels, kernel_size=1, stride=1, padding=0, bias=False),
-        #         BuildNormalization(placeholder=feats_channels, norm_cfg=norm_cfg),
-        #         BuildActivation(act_cfg),
-        #     )
+        # self.fuse_memory_conv = nn.Sequential(
+        #     nn.Conv2d(num_classes * self.num_feats_per_cls, num_classes, kernel_size=1, stride=1, padding=0, bias=False),
+        #     BuildNormalization(placeholder=num_classes, norm_cfg=norm_cfg),
+        #     BuildActivation(act_cfg),
+        # )
         # else:
         #     self.self_attention = SelfAttentionBlock(
         #         key_in_channels=feats_channels,
@@ -110,6 +110,8 @@ class FeaturesMemory(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(self.feats_channels // 2, self.feats_channels),
         )
+
+
     '''forward'''
     def forward(self, feats, preds=None, feats_ms=None):
         batch_size, num_channels, h, w = feats.size()
@@ -194,15 +196,12 @@ class FeaturesMemory(nn.Module):
         return pred * 15
 
     def post_refine_proto_v2(self, x, pred, proto):
-        # pred: [b, n, h, w]
-        # raw_x: [b, c, h, w]
-        # proto: [n, c]
-        # pred_proto: [n, c]
         raw_x = x.clone()
         b, c, h, w = raw_x.shape[:]
         pred = pred.view(b, proto.shape[0], h*w)
         pred = F.softmax(pred, 1)   # b, n, hw
         pred_proto = (pred @ raw_x.view(b, c, h*w).permute(0, 2, 1)) / (pred.sum(-1).unsqueeze(-1) + 1e-12)
+        # proto = torch.amax(proto, dim=1)
         pred_proto = torch.cat([pred_proto, proto.unsqueeze(0).repeat(pred_proto.shape[0], 1, 1)], -1)  # b, n, 2c
         pred_proto = self.proj(pred_proto)
         new_pred = self.get_pred(raw_x, pred_proto)
@@ -215,51 +214,24 @@ class FeaturesMemory(nn.Module):
         if momentum_cfg['adjust_by_learning_rate']:
             momentum = momentum_cfg['base_momentum'] / momentum_cfg['base_lr'] * learning_rate
         # use features to update memory
-        segmentation = segmentation.long()
-        features = features.permute(0, 2, 3, 1).contiguous()
-        features = features.view(batch_size * h * w, num_channels)
-        clsids = segmentation.unique()
-        for clsid in clsids:
-            if clsid == ignore_index: continue
-            # --(B, H, W) --> (B*H*W,)
-            seg_cls = segmentation.view(-1)
-            # --extract the corresponding feats: (K, C)
-            feats_cls = features[seg_cls == clsid]
-            # --init memory by using extracted features
-            need_update = True
-            for idx in range(self.num_feats_per_cls):
-                if (self.memory[clsid][idx] == 0).sum() == self.feats_channels:
-                    self.memory[clsid][idx].data.copy_(feats_cls.mean(0))
-                    need_update = False
-                    break
-            if not need_update: continue
-            # --update according to the selected strategy
-            if self.num_feats_per_cls == 1:
-                if strategy == 'mean':
-                    feats_cls = feats_cls.mean(0)
-                elif strategy == 'cosine_similarity':
-                    similarity = F.cosine_similarity(feats_cls, self.memory[clsid].data.expand_as(feats_cls))
-                    weight = (1 - similarity) / (1 - similarity).sum()
-                    feats_cls = (feats_cls * weight.unsqueeze(-1)).sum(0)
-                feats_cls = (1 - momentum) * self.memory[clsid].data + momentum * feats_cls.unsqueeze(0)
-                self.memory[clsid].data.copy_(feats_cls)
-            else:
-                assert strategy in ['cosine_similarity']
-                # ----(K, C) * (C, num_feats_per_cls) --> (K, num_feats_per_cls)
-                relation = torch.matmul(
-                    F.normalize(feats_cls, p=2, dim=1), 
-                    F.normalize(self.memory[clsid].data.permute(1, 0).contiguous(), p=2, dim=0),
-                )
-                argmax = relation.argmax(dim=1)
-                # ----for saving memory during training
-                for idx in range(self.num_feats_per_cls):
-                    mask = (argmax == idx)
-                    feats_cls_iter = feats_cls[mask]
-                    memory_cls_iter = self.memory[clsid].data[idx].unsqueeze(0).expand_as(feats_cls_iter)
-                    similarity = F.cosine_similarity(feats_cls_iter, memory_cls_iter)
-                    weight = (1 - similarity) / (1 - similarity).sum()
-                    feats_cls_iter = (feats_cls_iter * weight.unsqueeze(-1)).sum(0)
-                    self.memory[clsid].data[idx].copy_(self.memory[clsid].data[idx] * (1 - momentum) + feats_cls_iter * momentum)
+
+        tempmask = segmentation.long()
+        tempmask[tempmask == 255] = self.num_classes
+        tempmask = F.one_hot(tempmask, num_classes=self.num_classes + 1)
+        tempmask = tempmask.view(batch_size, -1, self.num_classes + 1)
+        denominator = tempmask.sum(1).unsqueeze(dim=1)
+
+        query =features.view(batch_size, num_channels, -1)
+        nominator = torch.matmul(query, tempmask.float())
+
+        nominator = torch.t(nominator.sum(0))  # batchwise sum
+        denominator = denominator.sum(0)  # batchwise sum
+        denominator = denominator.squeeze()
+
+        for slot in range(self.num_classes):
+            if denominator[slot] != 0:
+                feats_cls = (1 - momentum) * self.memory[slot].data  + (momentum * nominator[slot] / denominator[slot])
+                self.memory[slot].data.copy_(feats_cls)
         # syn the memory
         if dist.is_available() and dist.is_initialized():
             memory = self.memory.data.clone()
