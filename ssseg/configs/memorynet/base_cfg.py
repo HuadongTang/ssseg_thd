@@ -9,7 +9,7 @@ SEGMENTOR_CFG = {
     'logfilepath': '',
     'log_interval_iterations': 50,
     'eval_interval_epochs': 1,
-    'save_interval_epochs': 1,
+    'save_interval_epochs': 10,
     'resultsavepath': '',
     'norm_cfg': {'type': 'SyncBatchNorm'},
     'act_cfg': {'type': 'ReLU', 'inplace': True},
